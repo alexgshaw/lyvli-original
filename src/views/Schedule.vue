@@ -15,7 +15,15 @@
       <div class="vert-div"></div>
       <div class="card-calendar">
         <h2 id="date-time">Select a Date &#38; Time</h2>
-        <h3 id="month-name">{{ month }}</h3>
+        <h3 id="month-name">{{ monthName }} {{ year }}</h3>
+        <div class="calendar-arrows">
+          <div class="calendar-arrow" @click="iterateMonth(-1)">
+            <i class="fas fa-chevron-left"></i>
+          </div>
+          <div class="calendar-arrow" @click="iterateMonth(1)">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
         <div id="calendar">
           <div class="calendar-day" v-for="day in days">
             {{ day }}
@@ -25,12 +33,14 @@
             class="calendar-date"
             :class="{
               option: date.option,
-              selected: currentDate === date
+              selected:
+                currentDate &&
+                currentDate.fullDate.getTime() === date.fullDate.getTime()
             }"
             v-on="date.option ? { click: () => setCurrentDate(date) } : {}"
             v-for="date in dates"
           >
-            {{ date.date }}
+            {{ date.fullDate.getDate() }}
           </div>
         </div>
       </div>
@@ -49,52 +59,51 @@
 import moment from "moment";
 
 export default {
-  name: "ScheduleAppointment",
-  props: {
-    month: String,
-    year: Number
-  },
+  name: "Schedule",
   data: function() {
     return {
       days: moment.weekdaysShort(),
       startDayIndex: undefined,
       user: {},
-      currentDate: null
+      currentDate: null,
+      month: new Date().getMonth(),
+      year: new Date().getFullYear()
     };
   },
   created: function() {
     this.user = this.$root.$data.users.find(
       user => user.name === this.$route.params.id
     );
-    for (let availabilityDate of this.user.availability) {
-      this.dates[availabilityDate.day - 1].option = true;
-    }
   },
   computed: {
-    dayToColumn() {
-      // TODO check if this can be replaced with this.days.indexOf(day)
-      let dayToColumn = {};
-      this.days.forEach((day, i) => {
-        dayToColumn[day] = i;
-      });
-      return dayToColumn;
+    monthName() {
+      return moment.months()[this.month];
+    },
+    filteredAvailibility() {
+      return this.user.availability.filter(
+        availabilityDate =>
+          availabilityDate.year === this.year &&
+          availabilityDate.month == this.month
+      );
     },
     dates() {
-      const monthIndex = moment.months().indexOf(this.month);
-      var date = new Date(this.year, monthIndex, 1);
+      var date = new Date(this.year, this.month, 1);
       var dates = [];
 
-      while (date.getMonth() == monthIndex) {
+      while (date.getMonth() == this.month) {
         dates.push({
-          date: date.getDate(),
+          fullDate: new Date(date.getTime()),
           day: this.days[date.getDay()],
           option: false
         });
         date.setDate(date.getDate() + 1);
       }
 
-      const startDay = dates[0].day;
-      this.startDayIndex = this.dayToColumn[startDay];
+      for (let availabilityDate of this.filteredAvailibility) {
+        dates[availabilityDate.day - 1].option = true;
+      }
+
+      this.startDayIndex = dates[0].fullDate.getDay();
 
       return dates;
     },
@@ -122,7 +131,7 @@ export default {
     timeSlots() {
       if (Object.keys(this.dateToTimeSlots).length && this.currentDate) {
         const { startTime, endTime } = this.dateToTimeSlots[
-          this.currentDate.date // TODO do we need to check if this.currentDate has been set?
+          this.currentDate.fullDate.getDate() // TODO do we need to check if this.currentDate has been set?
         ];
         let minutes = (endTime - startTime) / 60000;
         let numSlots = Math.floor(minutes / this.user.duration);
@@ -139,6 +148,17 @@ export default {
   methods: {
     setCurrentDate(date) {
       this.currentDate = date;
+    },
+    iterateMonth(direction) {
+      this.month = this.month + direction;
+
+      if (this.month > 11) {
+        this.year++;
+        this.month = 0;
+      } else if (this.month < 0) {
+        this.year--;
+        this.month = 11;
+      }
     },
     log() {
       console.log("clicked");
@@ -194,6 +214,8 @@ export default {
 .card {
   display: flex;
   width: auto;
+  /* TODO figure out a better way to do this */
+  height: 590px;
   box-shadow: 0 1px 8px 0 #ebedef;
   border: 1px solid #d6dbdf;
   border-radius: 10px;
@@ -239,6 +261,28 @@ export default {
   align-items: center;
   padding: 20px 40px;
 }
+
+.calendar-arrows {
+  margin-top: 10px;
+  display: flex;
+  width: 100px;
+  justify-content: space-between;
+}
+
+.calendar-arrow {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.calendar-arrow:hover {
+  background-color: #eeeeee;
+}
+
 .card-calendar #date-time {
   margin-bottom: 20px;
 }
@@ -264,11 +308,6 @@ export default {
   justify-content: center;
   border-radius: 50%;
 }
-/* .card-calendar #calendar .calendar-date:hover {
-  background-color: #e1f5fe;
-  border: 1px solid #b3e5fc;
-  cursor: pointer;
-} */
 
 .option {
   background-color: #e1f5fe;

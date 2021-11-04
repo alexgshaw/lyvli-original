@@ -22,6 +22,15 @@ let users = [{
       endHour: 13,
       endMin: 0,
     },
+    {
+      year: 2021,
+      month: 10,
+      day: 6,
+      startHour: 12,
+      startMin: 0,
+      endHour: 13,
+      endMin: 0,
+    },
   ]
 }, {
   name: "Ty Easton",

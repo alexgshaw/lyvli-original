@@ -27,10 +27,10 @@ const routes = [{
     path: '/schedule/:id',
     name: 'Schedule',
     component: () => import('../views/Schedule.vue'),
-    props: {
-      month: "October",
-      year: 2021,
-    }
+    // props: {
+    //   month: "October",
+    //   year: 2021,
+    // }
   }
 ]
 
