@@ -47,9 +47,28 @@
       <div class="vert-div"></div>
       <div id="card-availability">
         <h3 v-if="timeSlots.length === 0">Select a Date</h3>
-        <a v-else class="button" v-for="timeSlot in timeSlots">
+
+        <!-- <router-link
+          v-else
+          class="button"
+          v-for="timeSlot in timeSlots"
+          :to="'/schedule-form/' + user.name"
+        > -->
+        <router-link
+          v-else
+          class="button"
+          v-for="timeSlot in timeSlots"
+          :to="{
+            name: 'ScheduleForm',
+            params: { user: user, timeSlot: timeSlot }
+          }"
+        >
           {{ formatDateTime(timeSlot) }}
-        </a>
+        </router-link>
+
+        <!-- <a v-else class="button" @click="log" v-for="timeSlot in timeSlots">
+          {{ formatDateTime(timeSlot) }}
+        </a> -->
       </div>
     </div>
   </div>
@@ -180,7 +199,6 @@ export default {
 <style scoped>
 .schedule-appointment {
   display: flex;
-  flex-direction: column;
   align-items: center;
 }
 
@@ -311,7 +329,7 @@ export default {
 
 .option {
   background-color: #e1f5fe;
-  border: 1px solid #b3e5fc;
+  /* border: 1px solid #b3e5fc; */
 }
 
 .option:hover {
@@ -320,7 +338,14 @@ export default {
 }
 
 .selected {
-  background-color: #b3e5fc;
+  /* background-color: #b3e5fc; */
+  background-color: #29b6f6;
+  color: white;
+  font-weight: bold;
+}
+
+.selected:hover {
+  background-color: #29b6f6;
 }
 
 #card-availability {
@@ -329,24 +354,24 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 40px;
-  width: 200px;
+  width: 250px;
 }
 
 .button {
   text-decoration: none;
   color: white;
-  background-color: #4fc3f7;
+  background-color: #29b6f6;
   border-radius: 10px;
   width: 150px;
   padding: 15px;
   text-align: center;
   font-weight: bold;
   margin: 5px;
-  border: 2px solid #29b6f6;
+  /* border: 2px solid #29b6f6; */
 }
 .button:hover {
-  background-color: #29b6f6;
-  transition: 0.2s;
+  /* background-color: #29b6f6;
+  transition: 0.2s; */
   cursor: pointer;
 }
 </style>

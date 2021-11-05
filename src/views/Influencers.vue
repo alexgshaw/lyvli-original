@@ -5,6 +5,7 @@
       <form class="pure-form">
         <!-- <i class="fas fa-search icon"></i> -->
         <input
+          id="search"
           type="text"
           v-model="searchText"
           placeholder="Search for your influencer"
@@ -57,34 +58,19 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  flex: 1;
 }
 
 .title {
   margin-bottom: 20px;
 }
 
-input[type="text"] {
-  width: 400px;
-  height: 40px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  background-color: #f5f5f5;
-  font-size: 1em;
-  margin-bottom: 20px;
-}
-
-input:focus-visible[type="text"] {
-  outline: none;
-}
-
-input::placeholder {
-  color: #9e9e9e;
-}
-
 .icon {
   position: absolute;
+}
+
+#search {
+  width: 400px;
 }
 
 .influencers {

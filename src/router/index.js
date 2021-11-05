@@ -27,10 +27,18 @@ const routes = [{
     path: '/schedule/:id',
     name: 'Schedule',
     component: () => import('../views/Schedule.vue'),
-    // props: {
-    //   month: "October",
-    //   year: 2021,
-    // }
+  },
+  {
+    path: '/schedule-form',
+    name: 'ScheduleForm',
+    component: () => import('../views/ScheduleForm.vue'),
+    props: true
+  },
+  {
+    path: '/confirmation',
+    name: 'Confirmation',
+    component: () => import('../views/Confirmation.vue'),
+    props: true
   }
 ]
 
