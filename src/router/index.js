@@ -10,15 +10,6 @@ const routes = [{
     component: Home
   },
   {
-    path: '/schedule-appointment',
-    name: 'ScheduleAppointment',
-    component: () => import('../views/ScheduleAppointment.vue'),
-    props: {
-      month: "October",
-      year: 2021,
-    }
-  },
-  {
     path: '/influencers',
     name: 'Influencers',
     component: () => import('../views/Influencers.vue'),
