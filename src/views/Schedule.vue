@@ -25,10 +25,14 @@
           </div>
         </div>
         <div id="calendar">
-          <div class="calendar-day" v-for="day in days">
+          <div class="calendar-day" v-for="day in days" :key="day">
             {{ day }}
           </div>
-          <div class="calendar-day" v-for="blank in Array(startDayIndex)"></div>
+          <div
+            class="calendar-day"
+            v-for="blank in Array(startDayIndex)"
+            :key="blank"
+          ></div>
           <div
             class="calendar-date"
             :class="{
@@ -39,6 +43,7 @@
             }"
             v-on="date.option ? { click: () => setCurrentDate(date) } : {}"
             v-for="date in dates"
+            :key="date"
           >
             {{ date.fullDate.getDate() }}
           </div>
@@ -58,6 +63,7 @@
           v-else
           class="button"
           v-for="timeSlot in timeSlots"
+          :key="formatDateTime(timeSlot)"
           :to="{
             name: 'ScheduleForm',
             params: { user: user, timeSlot: timeSlot }
@@ -82,7 +88,7 @@ export default {
   data: function() {
     return {
       days: moment.weekdaysShort(),
-      startDayIndex: undefined,
+      // startDayIndex: undefined,
       user: {},
       currentDate: null,
       month: new Date().getMonth(),
@@ -122,9 +128,12 @@ export default {
         dates[availabilityDate.day - 1].option = true;
       }
 
-      this.startDayIndex = dates[0].fullDate.getDay();
+      // this.startDayIndex = dates[0].fullDate.getDay();
 
       return dates;
+    },
+    startDayIndex() {
+      return this.dates[0].fullDate.getDay();
     },
     dateToTimeSlots() {
       let dateToTimeSlots = {};
@@ -179,9 +188,6 @@ export default {
         this.month = 11;
       }
     },
-    log() {
-      console.log("clicked");
-    },
     formatDateTime(date) {
       return date.toLocaleString("en-US", {
         hour: "numeric",
@@ -191,7 +197,7 @@ export default {
     }
   },
   watch: {
-    currentDate(newDate, oldDate) {}
+    currentDate() {}
   }
 };
 </script>
