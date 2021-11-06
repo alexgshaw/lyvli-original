@@ -1,80 +1,85 @@
 <template>
   <div class="schedule-appointment">
     <div class="card">
-      <div class="card-info">
-        <img class="profile-photo" :src="user.profilePhoto" :alt="user.name" />
-        <h1>Call with {{ user.name }}</h1>
-        <div class="card-info-details">
-          <h3>Duration: {{ user.duration }} minutes</h3>
-          <h3>Cost: ${{ user.cost }}.00</h3>
+      <div class="card-selection">
+        <div class="card-info">
+          <img
+            class="profile-photo"
+            :src="user.profilePhoto"
+            :alt="user.name"
+          />
+          <h1>Call with {{ user.name }}</h1>
+          <div class="card-info-details">
+            <h3>Duration: {{ user.duration }} minutes</h3>
+            <h3>Cost: ${{ user.cost }}.00</h3>
+          </div>
+          <div class="card-info-summary">
+            <p>{{ user.message }}</p>
+          </div>
         </div>
-        <div class="card-info-summary">
-          <p>{{ user.message }}</p>
+        <!-- <div class="vert-div"></div> -->
+        <div class="card-calendar">
+          <h2 id="date-time">Select a Date &#38; Time</h2>
+          <h3 id="month-name">{{ monthName }} {{ year }}</h3>
+          <div class="calendar-arrows">
+            <div class="calendar-arrow" @click="iterateMonth(-1)">
+              <i class="fas fa-chevron-left"></i>
+            </div>
+            <div class="calendar-arrow" @click="iterateMonth(1)">
+              <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+          <div id="calendar">
+            <div class="calendar-day" v-for="day in days" :key="day">
+              {{ day }}
+            </div>
+            <div
+              class="calendar-day"
+              v-for="(blank, i) in Array(startDayIndex)"
+              :key="i"
+            >
+              {{ blank }}
+            </div>
+            <div
+              class="calendar-date"
+              :class="{
+                option: date.option,
+                selected:
+                  currentDate &&
+                  currentDate.fullDate.getTime() === date.fullDate.getTime()
+              }"
+              v-on="date.option ? { click: () => setCurrentDate(date) } : {}"
+              v-for="date in dates"
+              :key="date.fullDate.getTime()"
+            >
+              {{ date.fullDate.getDate() }}
+            </div>
+          </div>
         </div>
       </div>
-      <div class="vert-div"></div>
-      <div class="card-calendar">
-        <h2 id="date-time">Select a Date &#38; Time</h2>
-        <h3 id="month-name">{{ monthName }} {{ year }}</h3>
-        <div class="calendar-arrows">
-          <div class="calendar-arrow" @click="iterateMonth(-1)">
-            <i class="fas fa-chevron-left"></i>
-          </div>
-          <div class="calendar-arrow" @click="iterateMonth(1)">
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </div>
-        <div id="calendar">
-          <div class="calendar-day" v-for="day in days" :key="day">
-            {{ day }}
-          </div>
-          <div
-            class="calendar-day"
-            v-for="blank in Array(startDayIndex)"
-            :key="blank"
-          ></div>
-          <div
-            class="calendar-date"
-            :class="{
-              option: date.option,
-              selected:
-                currentDate &&
-                currentDate.fullDate.getTime() === date.fullDate.getTime()
-            }"
-            v-on="date.option ? { click: () => setCurrentDate(date) } : {}"
-            v-for="date in dates"
-            :key="date"
-          >
-            {{ date.fullDate.getDate() }}
-          </div>
-        </div>
-      </div>
-      <div class="vert-div"></div>
+
+      <!-- <div class="vert-div"></div> -->
+      <!-- <div class="horizontal-div"></div> -->
+    </div>
+    <div class="card">
       <div id="card-availability">
-        <h3 v-if="timeSlots.length === 0">Select a Date</h3>
-
-        <!-- <router-link
-          v-else
-          class="button"
-          v-for="timeSlot in timeSlots"
-          :to="'/schedule-form/' + user.name"
-        > -->
-        <router-link
-          v-else
-          class="button"
-          v-for="timeSlot in timeSlots"
-          :key="formatDateTime(timeSlot)"
-          :to="{
-            name: 'ScheduleForm',
-            params: { user: user, timeSlot: timeSlot }
-          }"
-        >
-          {{ formatDateTime(timeSlot) }}
-        </router-link>
-
-        <!-- <a v-else class="button" @click="log" v-for="timeSlot in timeSlots">
-          {{ formatDateTime(timeSlot) }}
-        </a> -->
+        <h2>Open Time Slots</h2>
+        <h3 class="default-message" v-if="timeSlots.length === 0">
+          Select a Date
+        </h3>
+        <div v-else class="buttons">
+          <router-link
+            class="button"
+            v-for="timeSlot in timeSlots"
+            :key="formatDateTime(timeSlot)"
+            :to="{
+              name: 'ScheduleForm',
+              params: { user: user, timeSlot: timeSlot }
+            }"
+          >
+            {{ formatDateTime(timeSlot) }}
+          </router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -176,6 +181,10 @@ export default {
   methods: {
     setCurrentDate(date) {
       this.currentDate = date;
+
+      // Scroll the next section into view
+      let cardAvailability = document.querySelector("#card-availability");
+      cardAvailability.scrollIntoView();
     },
     iterateMonth(direction) {
       this.month = this.month + direction;
@@ -205,7 +214,9 @@ export default {
 <style scoped>
 .schedule-appointment {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  max-width: 900px;
 }
 
 .user-icons {
@@ -239,15 +250,32 @@ export default {
   display: flex;
   width: auto;
   /* TODO figure out a better way to do this */
-  height: 590px;
+  /* height: 590px; */
   box-shadow: 0 1px 8px 0 #ebedef;
   border: 1px solid #d6dbdf;
   border-radius: 10px;
+
+  flex-direction: column;
+  align-items: center;
+
+  margin: 20px 0;
+  width: 100%;
+}
+
+.card-selection {
+  display: flex;
+  height: 590px;
 }
 
 .vert-div {
   min-height: 100%;
   width: 1px;
+  background-color: #d6dbdf;
+}
+
+.horizontal-div {
+  min-width: 100%;
+  height: 1px;
   background-color: #d6dbdf;
 }
 
@@ -354,13 +382,23 @@ export default {
   background-color: #29b6f6;
 }
 
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 #card-availability {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px;
-  width: 250px;
+}
+
+#card-availability h2 {
+  margin-bottom: 20px;
 }
 
 .button {
@@ -379,5 +417,119 @@ export default {
   /* background-color: #29b6f6;
   transition: 0.2s; */
   cursor: pointer;
+}
+
+@media only screen and (min-width: 501px) and (max-width: 960px) {
+  .card-selection {
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+  }
+
+  .vert-div,
+  .horizontal-div {
+    display: none;
+  }
+
+  .card {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+  }
+
+  #card-availability {
+    width: auto;
+    padding: 0 20px;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+/* @media only screen and (max-width: 600px) { */
+@media only screen and (max-width: 500px) {
+  .card-selection {
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+  }
+
+  .card {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+  }
+
+  .vert-div,
+  .horizontal-div {
+    display: none;
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+  }
+
+  .card-calendar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+    padding: 20px 20px;
+  }
+
+  .card-calendar #calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+
+  .card-calendar #calendar .calendar-day {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+  }
+
+  .card-calendar #calendar .calendar-date {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  #card-availability {
+    padding: 0 20px;
+    width: auto;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .default-message {
+    display: none;
+  }
 }
 </style>

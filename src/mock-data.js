@@ -74,7 +74,7 @@ let users = [{
   profilePhoto: "/images/easton.jpg",
   availability: [{
       year: 2021,
-      month: 9,
+      month: 10,
       day: 2,
       startHour: 12,
       startMin: 0,
@@ -83,16 +83,16 @@ let users = [{
     },
     {
       year: 2021,
-      month: 9,
+      month: 10,
       day: 14,
       startHour: 18,
       startMin: 0,
-      endHour: 19,
+      endHour: 21,
       endMin: 0,
     },
     {
       year: 2021,
-      month: 9,
+      month: 10,
       day: 29,
       startHour: 14,
       startMin: 0,

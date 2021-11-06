@@ -156,4 +156,72 @@ export default {
 button {
   width: 200px;
 }
+
+@media only screen and (max-width: 960px) {
+  .card {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px 10px;
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .form-input {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin: 0 10px;
+    width: 100%;
+  }
+
+  .text-input {
+    flex: 1;
+  }
+
+  .form-button {
+    margin-top: 20px;
+  }
+
+  button {
+    width: 200px;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .form-button {
+    width: 100%;
+  }
+  button {
+    width: 100%;
+  }
+}
 </style>

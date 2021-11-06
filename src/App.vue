@@ -18,6 +18,10 @@
 </template>
 
 <style>
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -145,5 +149,12 @@ button:hover {
   text-decoration: none;
   font-weight: bold;
   color: black;
+}
+
+@media only screen and (max-width: 960px) {
+  #nav {
+    position: static;
+    margin-bottom: 20px;
+  }
 }
 </style>
