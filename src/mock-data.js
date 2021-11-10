@@ -8,7 +8,7 @@ let users = [
     availability: [
       {
         year: 2021,
-        month: 9,
+        month: 10,
         day: 1,
         startHour: 11,
         startMin: 0,
@@ -17,7 +17,7 @@ let users = [
       },
       {
         year: 2021,
-        month: 9,
+        month: 10,
         day: 6,
         startHour: 12,
         startMin: 0,
@@ -27,7 +27,7 @@ let users = [
       {
         year: 2021,
         month: 10,
-        day: 6,
+        day: 17,
         startHour: 12,
         startMin: 0,
         endHour: 13,
@@ -44,7 +44,7 @@ let users = [
     availability: [
       {
         year: 2021,
-        month: 9,
+        month: 10,
         day: 3,
         startHour: 10,
         startMin: 0,
@@ -53,7 +53,7 @@ let users = [
       },
       {
         year: 2021,
-        month: 9,
+        month: 10,
         day: 7,
         startHour: 18,
         startMin: 0,
@@ -62,7 +62,7 @@ let users = [
       },
       {
         year: 2021,
-        month: 9,
+        month: 10,
         day: 25,
         startHour: 14,
         startMin: 0,
@@ -116,7 +116,7 @@ let users = [
     availability: [
       {
         year: 2021,
-        month: 9,
+        month: 10,
         day: 13,
         startHour: 11,
         startMin: 0,
@@ -125,7 +125,7 @@ let users = [
       },
       {
         year: 2021,
-        month: 9,
+        month: 10,
         day: 3,
         startHour: 12,
         startMin: 0,

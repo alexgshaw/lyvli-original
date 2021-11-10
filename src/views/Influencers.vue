@@ -47,9 +47,11 @@ export default {
   },
   computed: {
     users() {
-      return this.$root.$data.users.filter(
-        (user) =>
-          user.name.toLowerCase().search(this.searchText.toLowerCase()) >= 0
+      return this.$root.$data.users.filter((user) =>
+        user.name
+          .toLowerCase()
+          .split(" ")
+          .some((name) => name.startsWith(this.searchText.toLowerCase()))
       );
     },
     userToNumTimeSlots() {
