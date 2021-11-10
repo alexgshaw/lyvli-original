@@ -46,7 +46,7 @@
                 option: date.option,
                 selected:
                   currentDate &&
-                  currentDate.fullDate.getTime() === date.fullDate.getTime()
+                  currentDate.fullDate.getTime() === date.fullDate.getTime(),
               }"
               v-on="date.option ? { click: () => setCurrentDate(date) } : {}"
               v-for="date in dates"
@@ -71,7 +71,7 @@
             :key="formatDateTime(timeSlot)"
             :to="{
               name: 'ScheduleForm',
-              params: { user: user, timeSlot: timeSlot }
+              params: { user: user, timeSlot: timeSlot },
             }"
           >
             {{ formatDateTime(timeSlot) }}
@@ -87,19 +87,19 @@ import moment from "moment";
 
 export default {
   name: "Schedule",
-  data: function() {
+  data: function () {
     return {
       days: moment.weekdaysShort(),
       // startDayIndex: undefined,
       user: {},
       currentDate: null,
       month: new Date().getMonth(),
-      year: new Date().getFullYear()
+      year: new Date().getFullYear(),
     };
   },
-  created: function() {
+  created: function () {
     this.user = this.$root.$data.users.find(
-      user => user.name === this.$route.params.id
+      (user) => user.name === this.$route.params.id
     );
   },
   computed: {
@@ -108,7 +108,7 @@ export default {
     },
     filteredAvailibility() {
       return this.user.availability.filter(
-        availabilityDate =>
+        (availabilityDate) =>
           availabilityDate.year === this.year &&
           availabilityDate.month == this.month
       );
@@ -121,7 +121,7 @@ export default {
         dates.push({
           fullDate: new Date(date.getTime()),
           day: this.days[date.getDay()],
-          option: false
+          option: false,
         });
         date.setDate(date.getDate() + 1);
       }
@@ -139,30 +139,24 @@ export default {
     },
     dateToTimeSlots() {
       let dateToTimeSlots = {};
-      this.user.availability.forEach(availabilitySlot => {
-        const {
-          year,
-          month,
-          day,
-          startHour,
-          startMin,
-          endHour,
-          endMin
-        } = availabilitySlot;
+      this.user.availability.forEach((availabilitySlot) => {
+        const { year, month, day, startHour, startMin, endHour, endMin } =
+          availabilitySlot;
         dateToTimeSlots[availabilitySlot.day] = {
           startHour: availabilitySlot.startHour,
           endHour: availabilitySlot.endHour,
           startTime: new Date(year, month, day, startHour, startMin),
-          endTime: new Date(year, month, day, endHour, endMin)
+          endTime: new Date(year, month, day, endHour, endMin),
         };
       });
       return dateToTimeSlots;
     },
     timeSlots() {
       if (Object.keys(this.dateToTimeSlots).length && this.currentDate) {
-        const { startTime, endTime } = this.dateToTimeSlots[
-          this.currentDate.fullDate.getDate() // TODO do we need to check if this.currentDate has been set?
-        ];
+        const { startTime, endTime } =
+          this.dateToTimeSlots[
+            this.currentDate.fullDate.getDate() // TODO do we need to check if this.currentDate has been set?
+          ];
         let minutes = (endTime - startTime) / 60000;
         let numSlots = Math.floor(minutes / this.user.duration);
         let slots = [startTime];
@@ -173,7 +167,7 @@ export default {
       } else {
         return [];
       }
-    }
+    },
   },
   methods: {
     setCurrentDate(date) {
@@ -198,13 +192,13 @@ export default {
       return date.toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
-        hour12: true
+        hour12: true,
       });
-    }
+    },
   },
   watch: {
-    currentDate() {}
-  }
+    currentDate() {},
+  },
 };
 </script>
 

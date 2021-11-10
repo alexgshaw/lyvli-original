@@ -76,9 +76,9 @@ export default {
   name: "ScheduleForm",
   props: {
     user: Object,
-    timeSlot: Date
+    timeSlot: Date,
   },
-  data: function() {
+  data: function () {
     return {};
   },
   computed: {
@@ -90,20 +90,20 @@ export default {
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        hour12: true
+        hour12: true,
       };
       return this.timeSlot.toLocaleString("en-US", options);
-    }
+    },
   },
   methods: {
     submit() {
       // this.$router.push("/confirmation");
       this.$router.push({
         name: "Confirmation",
-        params: { user: this.user, timeSlot: this.timeSlot }
+        params: { user: this.user, timeSlot: this.timeSlot },
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

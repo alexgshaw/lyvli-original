@@ -40,40 +40,33 @@
 <script>
 export default {
   name: "Influencers",
-  data: function() {
+  data: function () {
     return {
-      searchText: ""
+      searchText: "",
     };
   },
   computed: {
     users() {
       return this.$root.$data.users.filter(
-        user =>
+        (user) =>
           user.name.toLowerCase().search(this.searchText.toLowerCase()) >= 0
       );
     },
     userToNumTimeSlots() {
       let userToNumTimeSlots = {};
-      this.users.forEach(user => {
+      this.users.forEach((user) => {
         userToNumTimeSlots[user.name] = this.getUserTimeSlots(user);
       });
       return userToNumTimeSlots;
-    }
+    },
   },
   methods: {
     getUserTimeSlots(user) {
       let numSlots = 0;
 
-      user.availability.forEach(availabilityDate => {
-        const {
-          year,
-          month,
-          day,
-          startHour,
-          startMin,
-          endHour,
-          endMin
-        } = availabilityDate;
+      user.availability.forEach((availabilityDate) => {
+        const { year, month, day, startHour, startMin, endHour, endMin } =
+          availabilityDate;
 
         let startTime = new Date(year, month, day, startHour, startMin);
         let endTime = new Date(year, month, day, endHour, endMin);
@@ -86,8 +79,8 @@ export default {
       });
 
       return numSlots;
-    }
-  }
+    },
+  },
 };
 </script>
 

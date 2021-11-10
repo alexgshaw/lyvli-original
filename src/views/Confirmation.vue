@@ -10,7 +10,7 @@ export default {
   name: "Confirmation",
   props: {
     user: Object,
-    timeSlot: Date
+    timeSlot: Date,
   },
   computed: {
     timeString() {
@@ -21,11 +21,11 @@ export default {
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        hour12: true
+        hour12: true,
       };
       return this.timeSlot.toLocaleString("en-US", options);
-    }
-  }
+    },
+  },
 };
 </script>
 
