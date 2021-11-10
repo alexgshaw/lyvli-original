@@ -50,7 +50,7 @@ html {
   width: auto;
   box-shadow: 0 1px 8px 0 #ebedef;
   border: 1px solid #d6dbdf;
-  border-radius: 10px;
+  border-radius: 25px;
 }
 
 #nav {
@@ -119,7 +119,7 @@ button {
   font-size: 1em;
   color: white;
   background-color: #29b6f6;
-  border-radius: 10px;
+  border-radius: 25px;
   padding: 15px;
   text-align: center;
   font-weight: bold;

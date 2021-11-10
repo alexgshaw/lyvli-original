@@ -108,6 +108,14 @@ export default {
 </script>
 
 <style scoped>
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-align: center;
+}
 .schedule-agreement-container {
   /* width: 600px; */
 }
@@ -171,7 +179,7 @@ button {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    padding: 20px 10px;
+    padding: 20px 20px;
   }
 
   .header {

@@ -20,11 +20,11 @@
         <!-- <div class="vert-div"></div> -->
         <div class="card-calendar">
           <h2 id="date-time">Select a Date &#38; Time</h2>
-          <h3 id="month-name">{{ monthName }} {{ year }}</h3>
           <div class="calendar-arrows">
             <div class="calendar-arrow" @click="iterateMonth(-1)">
               <i class="fas fa-chevron-left"></i>
             </div>
+            <h3 id="month-name">{{ monthName }} {{ year }}</h3>
             <div class="calendar-arrow" @click="iterateMonth(1)">
               <i class="fas fa-chevron-right"></i>
             </div>
@@ -57,9 +57,6 @@
           </div>
         </div>
       </div>
-
-      <!-- <div class="vert-div"></div> -->
-      <!-- <div class="horizontal-div"></div> -->
     </div>
     <div class="card">
       <div id="card-availability">
@@ -253,7 +250,7 @@ export default {
   /* height: 590px; */
   box-shadow: 0 1px 8px 0 #ebedef;
   border: 1px solid #d6dbdf;
-  border-radius: 10px;
+  border-radius: 25px;
 
   flex-direction: column;
   align-items: center;
@@ -264,7 +261,7 @@ export default {
 
 .card-selection {
   display: flex;
-  height: 590px;
+  height: 550px;
 }
 
 .vert-div {
@@ -315,10 +312,14 @@ export default {
 }
 
 .calendar-arrows {
-  margin-top: 10px;
   display: flex;
-  width: 100px;
+  align-items: center;
+  /* width: 100px; */
   justify-content: space-between;
+}
+
+#month-name {
+  margin: 0 30px;
 }
 
 .calendar-arrow {
@@ -336,7 +337,7 @@ export default {
 }
 
 .card-calendar #date-time {
-  margin-bottom: 20px;
+  margin: 10px 0 20px 0;
 }
 .card-calendar #calendar {
   display: grid;
@@ -405,7 +406,7 @@ export default {
   text-decoration: none;
   color: white;
   background-color: #29b6f6;
-  border-radius: 10px;
+  border-radius: 25px;
   width: 150px;
   padding: 15px;
   text-align: center;

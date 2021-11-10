@@ -22,10 +22,13 @@
         <!-- <div class="influencer" v-for="user in users" :key="user.name"> -->
         <div class="person">
           <img :src="user.profilePhoto" :alt="user.name" />
-          <h2>{{ user.name }}</h2>
+          <div class="person-text">
+            <h2>{{ user.name }}</h2>
+            <h4>{{ userToNumTimeSlots[user.name] }} Slots Left</h4>
+          </div>
         </div>
         <div class="info">
-          <h4>${{ user.cost }}.00</h4>
+          <h3>${{ user.cost }}.00</h3>
           <h4>{{ user.duration }} minutes</h4>
         </div>
         <!-- </div> -->
@@ -48,6 +51,41 @@ export default {
         user =>
           user.name.toLowerCase().search(this.searchText.toLowerCase()) >= 0
       );
+    },
+    userToNumTimeSlots() {
+      let userToNumTimeSlots = {};
+      this.users.forEach(user => {
+        userToNumTimeSlots[user.name] = this.getUserTimeSlots(user);
+      });
+      return userToNumTimeSlots;
+    }
+  },
+  methods: {
+    getUserTimeSlots(user) {
+      let numSlots = 0;
+
+      user.availability.forEach(availabilityDate => {
+        const {
+          year,
+          month,
+          day,
+          startHour,
+          startMin,
+          endHour,
+          endMin
+        } = availabilityDate;
+
+        let startTime = new Date(year, month, day, startHour, startMin);
+        let endTime = new Date(year, month, day, endHour, endMin);
+
+        // TODO change this to update by hour not by day
+        if (new Date(year, month, day) > new Date()) {
+          let minutes = (endTime - startTime) / 60000;
+          numSlots += Math.floor(minutes / user.duration);
+        }
+      });
+
+      return numSlots;
     }
   }
 };
@@ -89,7 +127,7 @@ export default {
   justify-content: space-between;
   box-shadow: 0 1px 8px 0 #ebedef;
   border: 1px solid #d6dbdf;
-  border-radius: 10px;
+  border-radius: 25px;
   width: 600px;
   padding: 20px;
   margin: 10px 20px;
@@ -99,6 +137,12 @@ export default {
   /* width: 250px;
   height: 250px;
   flex-direction: column; */
+}
+
+.person-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .person {
@@ -125,8 +169,13 @@ export default {
   /* align-items: center; */
 }
 
+.info h3,
 .info h4 {
   margin: 5px 0;
+}
+
+.info h3 {
+  color: #2ecc71;
 }
 
 @media only screen and (max-width: 600px) {
@@ -169,7 +218,7 @@ export default {
     justify-content: space-between;
     box-shadow: 0 1px 8px 0 #ebedef;
     border: 1px solid #d6dbdf;
-    border-radius: 10px;
+    border-radius: 25px;
     width: 600px;
     padding: 20px;
     margin: 10px 20px;
