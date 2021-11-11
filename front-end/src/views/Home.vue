@@ -17,6 +17,12 @@ export default {
 }
 
 .home h1 {
+  font-size: 6em;
   margin-bottom: 20px;
+  color: #05668d;
+}
+
+.home h4 {
+  font-size: 1.2em;
 }
 </style>

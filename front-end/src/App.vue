@@ -29,7 +29,7 @@ html {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Poppins", Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* text-align: center; */
@@ -39,6 +39,21 @@ html {
   align-items: center;
   justify-content: space-between;
   min-height: 100vh;
+}
+
+h1,
+h2 {
+  font-weight: 900;
+}
+
+h3 {
+  font-weight: 600;
+}
+
+h4,
+h5,
+h6 {
+  font-weight: 500;
 }
 
 /* .non-footer {
@@ -75,7 +90,7 @@ html {
 }
 
 #nav a.router-link-exact-active {
-  color: #29b6f6;
+  color: #02c39a;
 }
 
 label {
@@ -85,7 +100,7 @@ label {
 input[type="text"],
 input[type="email"],
 textarea {
-  /* width: 400px; */
+  font-family: "Poppins", Avenir, Helvetica, Arial, sans-serif;
   height: 40px;
   padding: 15px;
   border: none;
@@ -94,7 +109,6 @@ textarea {
   font-size: 1em;
   margin-top: 5px;
   margin-bottom: 20px;
-  /* outline: 2px solid #9e9e9e; */
 }
 
 input:focus-visible[type="text"],
@@ -105,7 +119,6 @@ textarea:focus-visible {
 }
 
 textarea {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   resize: none;
   min-height: 200px;
 }
@@ -118,7 +131,7 @@ button {
   text-decoration: none;
   font-size: 1em;
   color: white;
-  background-color: #29b6f6;
+  background-color: #02c39a;
   border-radius: 25px;
   padding: 15px;
   text-align: center;

@@ -16,7 +16,7 @@ const routes = [
     component: () => import("../views/Influencers.vue"),
   },
   {
-    path: "/schedule/:id",
+    path: "/schedule/:instagram",
     name: "Schedule",
     component: () => import("../views/Schedule.vue"),
   },

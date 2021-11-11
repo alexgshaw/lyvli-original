@@ -1,6 +1,6 @@
 <template>
   <div class="influencers-container">
-    <h1 class="title">Influencers</h1>
+    <h1 class="title">Mentors</h1>
     <div class="search-form">
       <form class="pure-form">
         <!-- <i class="fas fa-search icon"></i> -->
@@ -15,21 +15,20 @@
     <div class="influencers">
       <router-link
         class="influencer"
-        v-for="user in users"
-        :key="user.name"
-        :to="'/schedule/' + user.name"
+        v-for="mentor in filteredMentors"
+        :key="mentor.instagram"
+        :to="'/schedule/' + mentor.instagram"
       >
-        <!-- <div class="influencer" v-for="user in users" :key="user.name"> -->
         <div class="person">
-          <img :src="user.profilePhoto" :alt="user.name" />
+          <img :src="mentor.photo" :alt="mentor.name" />
           <div class="person-text">
-            <h2>{{ user.name }}</h2>
-            <h4>{{ userToNumTimeSlots[user.name] }} Slots Left</h4>
+            <h2>{{ mentor.name }}</h2>
+            <h4>{{ mentor.maxAppointments }} Slots Left</h4>
           </div>
         </div>
         <div class="info">
-          <h3>${{ user.cost }}.00</h3>
-          <h4>{{ user.duration }} minutes</h4>
+          <h3>${{ mentor.price }}.00</h3>
+          <h4>{{ mentor.duration }} minutes</h4>
         </div>
         <!-- </div> -->
       </router-link>
@@ -38,49 +37,38 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Influencers",
   data: function () {
     return {
+      mentors: [],
       searchText: "",
     };
   },
   computed: {
-    users() {
-      return this.$root.$data.users.filter((user) =>
-        user.name
+    filteredMentors() {
+      return this.mentors.filter((mentor) =>
+        mentor.name
           .toLowerCase()
           .split(" ")
           .some((name) => name.startsWith(this.searchText.toLowerCase()))
       );
     },
-    userToNumTimeSlots() {
-      let userToNumTimeSlots = {};
-      this.users.forEach((user) => {
-        userToNumTimeSlots[user.name] = this.getUserTimeSlots(user);
-      });
-      return userToNumTimeSlots;
-    },
+  },
+  created() {
+    this.getMentors();
   },
   methods: {
-    getUserTimeSlots(user) {
-      let numSlots = 0;
-
-      user.availability.forEach((availabilityDate) => {
-        const { year, month, day, startHour, startMin, endHour, endMin } =
-          availabilityDate;
-
-        let startTime = new Date(year, month, day, startHour, startMin);
-        let endTime = new Date(year, month, day, endHour, endMin);
-
-        // TODO change this to update by hour not by day
-        if (new Date(year, month, day) > new Date()) {
-          let minutes = (endTime - startTime) / 60000;
-          numSlots += Math.floor(minutes / user.duration);
-        }
-      });
-
-      return numSlots;
+    async getMentors() {
+      try {
+        const response = await axios.get("/api/mentors");
+        this.mentors = response.data;
+        return true;
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };
@@ -170,7 +158,7 @@ export default {
 }
 
 .info h3 {
-  color: #2ecc71;
+  color: #00a896;
 }
 
 @media only screen and (max-width: 600px) {

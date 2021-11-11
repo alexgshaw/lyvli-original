@@ -3,18 +3,14 @@
     <div class="card">
       <div class="card-selection">
         <div class="card-info">
-          <img
-            class="profile-photo"
-            :src="user.profilePhoto"
-            :alt="user.name"
-          />
-          <h1>Call with {{ user.name }}</h1>
+          <img class="profile-photo" :src="mentor.photo" :alt="mentor.name" />
+          <h1>Call with {{ mentor.name }}</h1>
           <div class="card-info-details">
-            <h3>Duration: {{ user.duration }} minutes</h3>
-            <h3>Cost: ${{ user.cost }}.00</h3>
+            <h3>Duration: {{ mentor.duration }} minutes</h3>
+            <h3>Cost: ${{ mentor.price }}.00</h3>
           </div>
           <div class="card-info-summary">
-            <p>{{ user.message }}</p>
+            <p>{{ mentor.message }}</p>
           </div>
         </div>
         <!-- <div class="vert-div"></div> -->
@@ -24,7 +20,9 @@
             <div class="calendar-arrow" @click="iterateMonth(-1)">
               <i class="fas fa-chevron-left"></i>
             </div>
-            <h3 id="month-name">{{ monthName }} {{ year }}</h3>
+            <div id="month-name">
+              <h3>{{ monthName }} {{ year }}</h3>
+            </div>
             <div class="calendar-arrow" @click="iterateMonth(1)">
               <i class="fas fa-chevron-right"></i>
             </div>
@@ -61,20 +59,20 @@
     <div class="card">
       <div id="card-availability">
         <h2>Open Time Slots</h2>
-        <h3 class="default-message" v-if="timeSlots.length === 0">
+        <h3 class="default-message" v-if="meetingSlots.length === 0">
           Select a Date
         </h3>
         <div v-else class="buttons">
           <router-link
             class="button"
-            v-for="timeSlot in timeSlots"
-            :key="formatDateTime(timeSlot)"
+            v-for="meetingSlot in meetingSlots"
+            :key="formatDateTime(meetingSlot)"
             :to="{
               name: 'ScheduleForm',
-              params: { user: user, timeSlot: timeSlot },
+              params: { mentor: mentor, meetingSlot: meetingSlot },
             }"
           >
-            {{ formatDateTime(timeSlot) }}
+            {{ formatDateTime(meetingSlot) }}
           </router-link>
         </div>
       </div>
@@ -83,35 +81,40 @@
 </template>
 
 <script>
+// TODO allow multiple time slots on the same date
+
 import moment from "moment";
+import axios from "axios";
 
 export default {
   name: "Schedule",
   data: function () {
     return {
       days: moment.weekdaysShort(),
-      // startDayIndex: undefined,
-      user: {},
+      mentor: {},
       currentDate: null,
       month: new Date().getMonth(),
       year: new Date().getFullYear(),
     };
   },
   created: function () {
-    this.user = this.$root.$data.users.find(
-      (user) => user.name === this.$route.params.id
-    );
+    this.getMentor(this.$route.params.instagram);
   },
   computed: {
     monthName() {
       return moment.months()[this.month];
     },
-    filteredAvailibility() {
-      return this.user.availability.filter(
-        (availabilityDate) =>
-          availabilityDate.year === this.year &&
-          availabilityDate.month == this.month
-      );
+    filteredTimeSlots() {
+      if (Object.keys(this.mentor).length != 0) {
+        return this.mentor.timeSlots.filter((timeSlot) => {
+          let date = new Date(timeSlot.start);
+          return (
+            date.getFullYear() === this.year && date.getMonth() == this.month
+          );
+        });
+      } else {
+        return [];
+      }
     },
     dates() {
       var date = new Date(this.year, this.month, 1);
@@ -126,11 +129,10 @@ export default {
         date.setDate(date.getDate() + 1);
       }
 
-      for (let availabilityDate of this.filteredAvailibility) {
-        dates[availabilityDate.day - 1].option = true;
+      for (let timeSlot of this.filteredTimeSlots) {
+        let date = new Date(timeSlot.start);
+        dates[date.getDate() - 1].option = true;
       }
-
-      // this.startDayIndex = dates[0].fullDate.getDay();
 
       return dates;
     },
@@ -139,29 +141,32 @@ export default {
     },
     dateToTimeSlots() {
       let dateToTimeSlots = {};
-      this.user.availability.forEach((availabilitySlot) => {
-        const { year, month, day, startHour, startMin, endHour, endMin } =
-          availabilitySlot;
-        dateToTimeSlots[availabilitySlot.day] = {
-          startHour: availabilitySlot.startHour,
-          endHour: availabilitySlot.endHour,
-          startTime: new Date(year, month, day, startHour, startMin),
-          endTime: new Date(year, month, day, endHour, endMin),
-        };
-      });
+      if (Object.keys(this.mentor).length != 0) {
+        this.mentor.timeSlots.forEach((timeSlot) => {
+          let date = new Date(timeSlot.start);
+          dateToTimeSlots[date.getDate()] = timeSlot;
+        });
+      }
       return dateToTimeSlots;
     },
-    timeSlots() {
+    meetingSlots() {
       if (Object.keys(this.dateToTimeSlots).length && this.currentDate) {
-        const { startTime, endTime } =
-          this.dateToTimeSlots[
-            this.currentDate.fullDate.getDate() // TODO do we need to check if this.currentDate has been set?
-          ];
-        let minutes = (endTime - startTime) / 60000;
-        let numSlots = Math.floor(minutes / this.user.duration);
-        let slots = [startTime];
-        for (let i = 0; i < numSlots - 1; i++) {
-          slots.push(new Date(slots[i].getTime() + this.user.duration * 60000));
+        // TODO do we need to check if this.currentDate has been set?
+        let { start, end } =
+          this.dateToTimeSlots[this.currentDate.fullDate.getDate()];
+        start = new Date(start);
+        end = new Date(end);
+        const timeSlotDuration = (end - start) / 60000;
+        const totalMeetingDuration =
+          this.mentor.duration + this.mentor.bufferPostAppointment;
+        const numMeetingSlots = Math.floor(
+          timeSlotDuration / totalMeetingDuration
+        );
+        let slots = [start];
+        for (let i = 0; i < numMeetingSlots - 1; i++) {
+          slots.push(
+            new Date(slots[i].getTime() + totalMeetingDuration * 60000)
+          );
         }
         return slots;
       } else {
@@ -170,6 +175,15 @@ export default {
     },
   },
   methods: {
+    async getMentor(instagram) {
+      try {
+        const response = await axios.get("/api/mentors/" + instagram);
+        this.mentor = response.data;
+        return true;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     setCurrentDate(date) {
       this.currentDate = date;
 
@@ -313,6 +327,9 @@ export default {
 }
 
 #month-name {
+  display: flex;
+  justify-content: center;
+  width: 150px;
   margin: 0 30px;
 }
 
@@ -345,7 +362,7 @@ export default {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-weight: bold;
+  font-weight: 600;
 }
 .card-calendar #calendar .calendar-date {
   width: 50px;
@@ -357,24 +374,24 @@ export default {
 }
 
 .option {
-  background-color: #e1f5fe;
+  background-color: #02c39933;
   /* border: 1px solid #b3e5fc; */
 }
 
 .option:hover {
-  background-color: #b3e5fc;
+  background-color: #02c39a80;
   cursor: pointer;
 }
 
 .selected {
   /* background-color: #b3e5fc; */
-  background-color: #29b6f6;
+  background-color: #02c39a;
   color: white;
   font-weight: bold;
 }
 
 .selected:hover {
-  background-color: #29b6f6;
+  background-color: #02c39a;
 }
 
 .buttons {
@@ -399,17 +416,17 @@ export default {
 .button {
   text-decoration: none;
   color: white;
-  background-color: #29b6f6;
+  background-color: #02c39a;
   border-radius: 25px;
   width: 150px;
   padding: 15px;
   text-align: center;
   font-weight: bold;
   margin: 5px;
-  /* border: 2px solid #29b6f6; */
+  /* border: 2px solid #02c39a; */
 }
 .button:hover {
-  /* background-color: #29b6f6;
+  /* background-color: #02c39a;
   transition: 0.2s; */
   cursor: pointer;
 }
@@ -496,11 +513,6 @@ export default {
   .card-calendar #calendar .calendar-day {
     width: 40px;
     height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-weight: bold;
   }
 
   .card-calendar #calendar .calendar-date {
