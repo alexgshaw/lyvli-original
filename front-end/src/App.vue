@@ -41,13 +41,13 @@ html {
   min-height: 100vh;
 }
 
-h1,
-h2 {
+h1 {
   font-weight: 900;
 }
 
+h2,
 h3 {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 h4,
