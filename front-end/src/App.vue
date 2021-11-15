@@ -83,13 +83,14 @@ h6 {
 }
 
 #nav a {
-  font-weight: bold;
   color: black;
   margin: 0 20px;
   text-decoration: none;
 }
 
 #nav a.router-link-exact-active {
+  font-weight: bold;
+
   color: #02c39a;
 }
 

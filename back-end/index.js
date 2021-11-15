@@ -21,9 +21,11 @@ function splitTimeSlot(appointment, timeSlot, mentor) {
 
   const totalMeetingDuration = mentor.duration + mentor.bufferPostAppointment;
 
+  // TODO rework this filter to account for  the appointment being the last in the time slot
+  // (don't need to worry about buffer in that case)
   return newTimeSlots.filter((timeSlot) => {
-    start = new Date(timeSlot.start);
-    end = new Date(timeSlot.end);
+    let start = new Date(timeSlot.start);
+    let end = new Date(timeSlot.end);
     return (end - start) / 60000 >= totalMeetingDuration;
   });
 }
@@ -43,13 +45,13 @@ function updateTimeSlots(appointment) {
 
   newTimeSlots = splitTimeSlot(appointment, timeSlot, mentor);
 
-  mentor.timeSlots = mentor.timeSlots.filter(
-    (timeSlot) => new Date(timeSlot.start).getTime() != start.getTime()
+  let oldIndex = mentor.timeSlots.findIndex(
+    (oldTimeSlot) =>
+      new Date(oldTimeSlot.start).getTime() ===
+      new Date(timeSlot.start).getTime()
   );
 
-  console.log(newTimeSlots);
-
-  mentor.timeSlots = mentor.timeSlots.concat(newTimeSlots);
+  mentor.timeSlots.splice(oldIndex, 1, ...newTimeSlots);
 }
 
 const app = express();
@@ -92,7 +94,16 @@ app.get("/api/mentors", (req, res) => {
 
 app.get("/api/mentors/:instagram", (req, res) => {
   const instagram = req.params.instagram;
-  const mentor = mentors.find((mentor) => mentor.instagram === instagram);
+  let mentor = Object.assign(
+    {},
+    mentors.find((mentor) => mentor.instagram === instagram)
+  );
+
+  const today = new Date();
+  mentor.timeSlots = mentor.timeSlots.filter((timeSlot) => {
+    return today < new Date(timeSlot.start);
+  });
+
   res.send(mentor);
 });
 

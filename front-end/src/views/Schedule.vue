@@ -13,17 +13,24 @@
             <p>{{ mentor.message }}</p>
           </div>
         </div>
-        <!-- <div class="vert-div"></div> -->
         <div class="card-calendar">
-          <h2 id="date-time">Select a Date &#38; Time</h2>
+          <h2 id="date-time">Select a Date</h2>
           <div class="calendar-arrows">
-            <div class="calendar-arrow" @click="iterateMonth(-1)">
+            <div
+              class="calendar-arrow"
+              :class="{ 'inactive-arrow': present }"
+              v-on="present ? {} : { click: () => iterateMonth(-1) }"
+            >
               <i class="fas fa-chevron-left"></i>
             </div>
             <div id="month-name">
               <h3>{{ monthName }} {{ year }}</h3>
             </div>
-            <div class="calendar-arrow" @click="iterateMonth(1)">
+            <div
+              class="calendar-arrow"
+              :class="{ 'inactive-arrow': futureLimit }"
+              v-on="futureLimit ? {} : { click: () => iterateMonth(1) }"
+            >
               <i class="fas fa-chevron-right"></i>
             </div>
           </div>
@@ -58,7 +65,7 @@
     </div>
     <div class="card">
       <div id="card-availability">
-        <h2>Open Time Slots</h2>
+        <h2 id="open-slots">Open Time Slots</h2>
         <h3 class="default-message" v-if="meetingSlots.length === 0">
           Select a Date
         </h3>
@@ -81,16 +88,29 @@
 </template>
 
 <script>
-// TODO allow multiple time slots on the same date
-
-import moment from "moment";
 import axios from "axios";
+
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 export default {
   name: "Schedule",
   data: function () {
     return {
-      days: moment.weekdaysShort(),
+      days: DAY_NAMES,
       mentor: {},
       currentDate: null,
       month: new Date().getMonth(),
@@ -102,14 +122,35 @@ export default {
   },
   computed: {
     monthName() {
-      return moment.months()[this.month];
+      return MONTH_NAMES[this.month];
+    },
+    present() {
+      let today = new Date();
+      return (
+        this.month === today.getMonth() && this.year === today.getFullYear()
+      );
+    },
+    maxDate() {
+      if (Object.keys(this.mentor).length != 0) {
+        return this.mentor.timeSlots.reduce((maxDate, timeSlot) => {
+          return timeSlot.start > maxDate ? timeSlot.start : maxDate;
+        }, new Date());
+      } else {
+        return new Date();
+      }
+    },
+    futureLimit() {
+      return (
+        this.month === this.maxDate.getMonth() &&
+        this.year === this.maxDate.getFullYear()
+      );
     },
     filteredTimeSlots() {
       if (Object.keys(this.mentor).length != 0) {
         return this.mentor.timeSlots.filter((timeSlot) => {
-          let date = new Date(timeSlot.start);
           return (
-            date.getFullYear() === this.year && date.getMonth() == this.month
+            timeSlot.start.getFullYear() === this.year &&
+            timeSlot.start.getMonth() == this.month
           );
         });
       } else {
@@ -129,46 +170,47 @@ export default {
         date.setDate(date.getDate() + 1);
       }
 
-      for (let timeSlot of this.filteredTimeSlots) {
-        let date = new Date(timeSlot.start);
-        dates[date.getDate() - 1].option = true;
-      }
+      this.filteredTimeSlots.forEach((timeSlot) => {
+        dates[timeSlot.start.getDate() - 1].option = true;
+      });
 
       return dates;
     },
     startDayIndex() {
       return this.dates[0].fullDate.getDay();
     },
-    dateToTimeSlots() {
-      let dateToTimeSlots = {};
-      if (Object.keys(this.mentor).length != 0) {
-        this.mentor.timeSlots.forEach((timeSlot) => {
-          let date = new Date(timeSlot.start);
-          dateToTimeSlots[date.getDate()] = timeSlot;
-        });
-      }
-      return dateToTimeSlots;
-    },
     meetingSlots() {
-      if (Object.keys(this.dateToTimeSlots).length && this.currentDate) {
-        // TODO do we need to check if this.currentDate has been set?
-        let { start, end } =
-          this.dateToTimeSlots[this.currentDate.fullDate.getDate()];
-        start = new Date(start);
-        end = new Date(end);
-        const timeSlotDuration = (end - start) / 60000;
+      if (this.currentDate) {
+        const currentTimeSlots = this.mentor.timeSlots.filter((timeSlot) => {
+          return (
+            timeSlot.start.getDate() === this.currentDate.fullDate.getDate()
+          );
+        });
+
+        // TODO sort the meetingSlots list by date and make sure none of these overlap. Best to do the overlap on the back-end
+
         const totalMeetingDuration =
           this.mentor.duration + this.mentor.bufferPostAppointment;
-        const numMeetingSlots = Math.floor(
-          timeSlotDuration / totalMeetingDuration
-        );
-        let slots = [start];
-        for (let i = 0; i < numMeetingSlots - 1; i++) {
-          slots.push(
-            new Date(slots[i].getTime() + totalMeetingDuration * 60000)
+
+        let meetingSlots = [];
+        currentTimeSlots.forEach((timeSlot) => {
+          let { start, end } = timeSlot;
+          let timeSlotDuration = (end - start) / 60000;
+          let numMeetingSlots = Math.floor(
+            timeSlotDuration / totalMeetingDuration
           );
-        }
-        return slots;
+          meetingSlots.push(start);
+          for (let i = 0; i < numMeetingSlots - 1; i++) {
+            meetingSlots.push(
+              new Date(
+                meetingSlots[meetingSlots.length - 1].getTime() +
+                  totalMeetingDuration * 60000
+              )
+            );
+          }
+        });
+
+        return meetingSlots;
       } else {
         return [];
       }
@@ -179,6 +221,15 @@ export default {
       try {
         const response = await axios.get("/api/mentors/" + instagram);
         this.mentor = response.data;
+
+        // Set the date strings to be date objects
+        this.mentor.timeSlots = this.mentor.timeSlots.map((timeSlot) => {
+          return {
+            start: new Date(timeSlot.start),
+            end: new Date(timeSlot.end),
+          };
+        });
+
         return true;
       } catch (error) {
         console.log(error);
@@ -201,6 +252,8 @@ export default {
         this.year--;
         this.month = 11;
       }
+
+      this.currentDate = null;
     },
     formatDateTime(date) {
       return date.toLocaleString("en-US", {
@@ -221,7 +274,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 900px;
+  width: 900px;
 }
 
 .user-icons {
@@ -243,26 +296,14 @@ export default {
   cursor: pointer;
 }
 
-.active {
-  border: 2px solid #81d4fa;
-}
-
-/* .active:hover {
-  border: 2px solid #81d4fa;
-} */
-
 .card {
   display: flex;
   width: auto;
-  /* TODO figure out a better way to do this */
-  /* height: 590px; */
   box-shadow: 0 1px 8px 0 #ebedef;
   border: 1px solid #d6dbdf;
   border-radius: 25px;
-
   flex-direction: column;
   align-items: center;
-
   margin: 20px 0;
   width: 100%;
 }
@@ -270,18 +311,6 @@ export default {
 .card-selection {
   display: flex;
   height: 550px;
-}
-
-.vert-div {
-  min-height: 100%;
-  width: 1px;
-  background-color: #d6dbdf;
-}
-
-.horizontal-div {
-  min-width: 100%;
-  height: 1px;
-  background-color: #d6dbdf;
 }
 
 .card-info {
@@ -294,14 +323,11 @@ export default {
   width: 400px;
 }
 
-.card-info .card-info-details {
+.card-info-details {
   margin: 40px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.card-info .card-info-summary {
 }
 
 .profile-photo {
@@ -329,7 +355,7 @@ export default {
 #month-name {
   display: flex;
   justify-content: center;
-  width: 150px;
+  width: 180px;
   margin: 0 30px;
 }
 
@@ -347,15 +373,25 @@ export default {
   background-color: #eeeeee;
 }
 
-.card-calendar #date-time {
-  margin: 10px 0 20px 0;
+.inactive-arrow {
+  color: #d6dbdf;
 }
-.card-calendar #calendar {
+
+.inactive-arrow:hover {
+  background-color: inherit;
+  cursor: auto;
+}
+
+#date-time {
+  margin: 10px 0 20px 0;
+  text-align: center;
+}
+#calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 10px;
 }
-.card-calendar #calendar .calendar-day {
+.calendar-day {
   width: 50px;
   height: 50px;
   display: flex;
@@ -364,7 +400,7 @@ export default {
   border-radius: 50%;
   font-weight: 600;
 }
-.card-calendar #calendar .calendar-date {
+.calendar-date {
   width: 50px;
   height: 50px;
   display: flex;
@@ -374,12 +410,14 @@ export default {
 }
 
 .option {
-  background-color: #02c39933;
+  background-color: #02c3991a;
+  color: #02c39a;
+  font-weight: bold;
   /* border: 1px solid #b3e5fc; */
 }
 
 .option:hover {
-  background-color: #02c39a80;
+  background-color: #02c39a33;
   cursor: pointer;
 }
 
@@ -431,24 +469,25 @@ export default {
   cursor: pointer;
 }
 
-@media only screen and (min-width: 501px) and (max-width: 960px) {
+@media only screen and (max-width: 960px) {
+  .schedule-appointment {
+    width: auto;
+  }
+  .card-info {
+    padding: 20px;
+    width: 100%;
+  }
+
   .card-selection {
     flex-direction: column;
     align-items: center;
     height: auto;
   }
 
-  .vert-div,
-  .horizontal-div {
-    display: none;
-  }
-
   .card {
     box-shadow: none;
     border: none;
     border-radius: 0;
-    flex-direction: column;
-    align-items: center;
     height: auto;
   }
 
@@ -462,40 +501,19 @@ export default {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
+
+  #date-time {
+    font-size: 2em;
+    font-weight: 900;
+  }
+
+  #open-slots {
+    font-size: 2em;
+    font-weight: 900;
+  }
 }
 
-/* @media only screen and (max-width: 600px) { */
 @media only screen and (max-width: 500px) {
-  .card-selection {
-    flex-direction: column;
-    align-items: center;
-    height: auto;
-  }
-
-  .card {
-    box-shadow: none;
-    border: none;
-    border-radius: 0;
-    flex-direction: column;
-    align-items: center;
-    height: auto;
-  }
-
-  .vert-div,
-  .horizontal-div {
-    display: none;
-  }
-
-  .card-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    padding: 20px;
-    width: 100%;
-  }
-
   .card-calendar {
     display: flex;
     flex-direction: column;
@@ -504,39 +522,20 @@ export default {
     padding: 20px 20px;
   }
 
-  .card-calendar #calendar {
+  #calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 8px;
   }
 
-  .card-calendar #calendar .calendar-day {
+  .calendar-day {
     width: 40px;
     height: 40px;
   }
 
-  .card-calendar #calendar .calendar-date {
+  .calendar-date {
     width: 40px;
     height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-  }
-
-  #card-availability {
-    padding: 0 20px;
-    width: auto;
-  }
-
-  .buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  .default-message {
-    display: none;
   }
 }
 </style>

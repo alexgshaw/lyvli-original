@@ -32,6 +32,7 @@ export default {
 <style scoped>
 .confirmation-container {
   text-align: center;
+  width: 90%;
 }
 
 .confirmation-container h1 {

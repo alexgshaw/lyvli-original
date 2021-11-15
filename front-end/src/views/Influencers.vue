@@ -95,9 +95,6 @@ export default {
 }
 
 .influencers {
-  /* display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -116,10 +113,6 @@ export default {
   margin: 10px 20px;
   text-decoration: none;
   color: black;
-
-  /* width: 250px;
-  height: 250px;
-  flex-direction: column; */
 }
 
 .person-text {
@@ -132,24 +125,18 @@ export default {
   display: flex;
   align-items: center;
   text-align: center;
-
-  /* flex-direction: column; */
 }
 
 .person img {
   width: 75px;
   border-radius: 50%;
   margin-right: 30px;
-
-  /* margin-bottom: 20px; */
 }
 
 .info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-
-  /* align-items: center; */
 }
 
 .info h3,
@@ -167,7 +154,7 @@ export default {
     flex-direction: column;
     align-items: center;
     flex: 1;
-    width: 100%;
+    width: 90%;
   }
 
   .search-form {
@@ -180,7 +167,7 @@ export default {
   }
 
   #search {
-    margin: 0 10px;
+    margin: 0;
     width: auto;
     flex: 1;
     margin-bottom: 20px;
@@ -188,11 +175,10 @@ export default {
 
   .influencers {
     display: flex;
-    /* width: 100%;
-    padding: 0 20px; */
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    width: 250px;
   }
 
   .influencer {
@@ -210,7 +196,7 @@ export default {
 
     /* width: 250px; */
     width: 100%;
-    height: 250px;
+    /* height: 250px; */
     flex-direction: column;
   }
 
@@ -223,12 +209,14 @@ export default {
   }
 
   .person img {
-    width: 75px;
+    width: 100px;
     border-radius: 50%;
-    margin-right: 30px;
+    margin: 20px 0;
+    margin-top: 5px;
+  }
 
-    margin-right: 0;
-    margin-bottom: 20px;
+  .person-text {
+    align-items: center;
   }
 
   .info {

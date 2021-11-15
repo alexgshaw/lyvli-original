@@ -25,4 +25,17 @@ export default {
 .home h4 {
   font-size: 1.2em;
 }
+
+@media only screen and (max-width: 600px) {
+  .home {
+    width: 90%;
+  }
+  .home h1 {
+    font-size: 2.5em;
+  }
+
+  .home h4 {
+    font-size: 1em;
+  }
+}
 </style>

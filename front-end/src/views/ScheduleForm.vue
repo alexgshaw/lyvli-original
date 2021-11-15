@@ -155,6 +155,11 @@ export default {
 </script>
 
 <style scoped>
+.schedule-agreement-container {
+  display: flex;
+  justify-content: center;
+}
+
 h1,
 h2,
 h3,
@@ -162,9 +167,6 @@ h4,
 h5,
 h6 {
   text-align: center;
-}
-.schedule-agreement-container {
-  /* width: 600px; */
 }
 
 .card-content {
@@ -212,6 +214,10 @@ button {
   width: 200px;
 }
 
+.confirmation {
+  width: 90%;
+}
+
 .confirmation h1 {
   margin-bottom: 20px;
 }
@@ -229,8 +235,8 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    padding: 20px 20px;
+    width: 90%;
+    padding: 20px 0;
   }
 
   .header {
@@ -281,6 +287,7 @@ button {
   }
   button {
     width: 100%;
+    border-radius: 10px;
   }
 }
 </style>
